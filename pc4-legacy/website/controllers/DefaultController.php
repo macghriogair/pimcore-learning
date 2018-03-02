@@ -8,7 +8,12 @@ class DefaultController extends Action
     public function defaultAction()
     {
 
-		$this->view->posts = new Object\BlogPost\Listing;
+		$posts = new Object\BlogPost\Listing;
 
+		$paginator = \Zend_Paginator::factory($posts);
+    	$paginator->setCurrentPageNumber($this->_getParam('page'));
+    	$paginator->setItemCountPerPage(2);
+
+    	$this->view->paginator = $paginator;
     }
 }

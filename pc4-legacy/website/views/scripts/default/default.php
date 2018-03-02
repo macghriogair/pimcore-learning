@@ -72,7 +72,7 @@
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
 
-          <?php foreach($this->posts as $post) { ?>
+          <?php foreach($this->paginator as $post) { ?>
           <div class="post-preview">
             <a href="post.html">
               <h2 class="post-title">
@@ -94,7 +94,12 @@
           
           <!-- Pager -->
           <div class="clearfix">
-            <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+            <!-- pagination start -->
+            <?= $this->paginationControl($this->paginator, 'Sliding', 'partials/paging.php', [
+               'urlprefix' => $this->document->getFullPath() . '?page=', // just example (this parameter could be used in paging.php to construct the url)
+               'appendQueryString' => true // just example (this parameter could be used in paging.php to construct the url)
+            ]); ?>
+            <!-- pagination end -->
           </div>
         </div>
       </div>
