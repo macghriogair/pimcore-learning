@@ -1,0 +1,118 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% macro feature_flags_toolbar(collector, type, title) %}
+    {% if collector.isFeatureAllFlagSet(type) or collector.featureHasFlags(type) %}
+        <div class="sf-toolbar-info-piece">
+            <b>{{ title }}</b>
+
+            <span>
+                {% if collector.isFeatureAllFlagSet(type) %}
+                    enabled
+                {% else %}
+                    {% transchoice collector.getFeatureFlags(type)|length %}
+                        {0} No flags enabled|{1} %count% flag enabled|]1,Inf] %count% flags enabled
+                    {% endtranschoice %}
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro feature_flags_metric(collector, type, title) %}
+    <div class="metric">
+        <span class="value">
+            {% if collector.isFeatureAllFlagSet(type) %}
+                enabled
+            {% elseif collector.featureHasFlags(type) %}
+                {% transchoice collector.getFeatureFlags(type)|length %}
+                    {0} No flags enabled|{1} %count% flag enabled|]1,Inf] %count% flags enabled
+                {% endtranschoice %}
+            {% else %}
+                disabled
+            {% endif %}
+        </span>
+        <span class="label">{{ title }}</span>
+    </div>
+{% endmacro %}
+
+{% macro feature_flags_list(collector, type, title) %}
+    {% if collector.featureHasFlags(type) %}
+        <h3>{{ title }}</h3>
+
+        <div class="card">
+            {% for flag in collector.getFeatureFlags(type) %}
+                <span class="label" style="margin-bottom: 2px">{{ flag }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% block toolbar %}
+    {% import _self as macros %}
+
+    {% set icon %}
+        {# this is the content displayed as a panel in the toolbar #}
+        <div style="padding-top: 3px">
+            {{ include("PimcoreCoreBundle:Profiler:logo.svg.twig") }}
+        </div>
+    {% endset %}
+
+    {% set text %}
+        {# this is the content displayed when hovering the mouse over
+           the toolbar panel #}
+        <div class="sf-toolbar-info-piece">
+            <b>Version</b>
+            <span>{{ collector.version }} build {{ collector.revision }}</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>Context</b>
+            <span>{{ collector.context }}</span>
+        </div>
+
+        {{ macros.feature_flags_toolbar(collector, 'debug_mode', 'Debug Mode') }}
+        {{ macros.feature_flags_toolbar(collector, 'dev_mode', 'Dev Mode') }}
+    {% endset %}
+
+    {# the 'link' value set to 'false' means that this panel doesn't
+       show a section in the web profiler #}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon">
+            {{ include("PimcoreCoreBundle:Profiler:logo.svg.twig") }}
+        </span>
+        <strong>Pimcore</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    {% import _self as macros %}
+
+    <h2>Pimcore</h2>
+
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.version }}</span>
+            <span class="label">Version</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.revision }}</span>
+            <span class="label">Build</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.context }}</span>
+            <span class="label">Request Context</span>
+        </div>
+
+        {{ macros.feature_flags_metric(collector, 'debug_mode', 'Debug Mode') }}
+        {{ macros.feature_flags_metric(collector, 'dev_mode', 'Dev Mode') }}
+    </div>
+
+    {{ macros.feature_flags_list(collector, 'debug_mode', 'Debug Mode Flags') }}
+    {{ macros.feature_flags_list(collector, 'dev_mode', 'Dev Mode Flags') }}
+{% endblock %}

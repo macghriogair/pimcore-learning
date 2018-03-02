@@ -1,0 +1,6 @@
+vendor
+!pc4-legacy/static/vendor
+/var/tmp/*
+.DS_Store
+.vagrant
+.idea
