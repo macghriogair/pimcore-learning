@@ -86,7 +86,7 @@
             </a>
             <p class="post-meta">Posted by
               <a href="#"><?= $post->getAuthor(); ?></a>
-              on September 24, 2018</p>
+              on <?= $post->getPosted_at()->format('d.m.Y'); ?></p>
           </div>
           <hr>
           <?php } ?>
